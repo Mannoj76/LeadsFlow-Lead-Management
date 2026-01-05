@@ -1,0 +1,662 @@
+// Mock data service for LeadsFlow CRM
+import type { 
+  User, 
+  Lead, 
+  Note, 
+  Activity, 
+  FollowUp, 
+  PipelineStage, 
+  LeadSource, 
+  LeadStatus,
+  SystemSettings,
+  DashboardStats
+} from '../types';
+
+const STORAGE_KEYS = {
+  USERS: 'leadsflow_users',
+  LEADS: 'leadsflow_leads',
+  NOTES: 'leadsflow_notes',
+  ACTIVITIES: 'leadsflow_activities',
+  FOLLOW_UPS: 'leadsflow_followups',
+  PIPELINE_STAGES: 'leadsflow_pipeline_stages',
+  LEAD_SOURCES: 'leadsflow_lead_sources',
+  LEAD_STATUSES: 'leadsflow_lead_statuses',
+  SETTINGS: 'leadsflow_settings',
+  CURRENT_USER: 'leadsflow_current_user',
+};
+
+// Initialize default data
+const initDefaultData = () => {
+  // Default admin user
+  const defaultUsers: User[] = [
+    {
+      id: '1',
+      name: 'Admin User',
+      email: 'admin@leadsflow.com',
+      role: 'admin',
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      name: 'John Sales',
+      email: 'john@leadsflow.com',
+      role: 'sales',
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+  ];
+
+  // Default pipeline stages
+  const defaultStages: PipelineStage[] = [
+    { id: '1', name: 'New Lead', order: 1, color: '#3b82f6' },
+    { id: '2', name: 'Contacted', order: 2, color: '#8b5cf6' },
+    { id: '3', name: 'Qualified', order: 3, color: '#f59e0b' },
+    { id: '4', name: 'Proposal Sent', order: 4, color: '#06b6d4' },
+    { id: '5', name: 'Negotiation', order: 5, color: '#ec4899' },
+    { id: '6', name: 'Closed Won', order: 6, color: '#10b981' },
+    { id: '7', name: 'Closed Lost', order: 7, color: '#64748b' },
+  ];
+
+  // Default lead sources
+  const defaultSources: LeadSource[] = [
+    { id: '1', name: 'Website' },
+    { id: '2', name: 'Referral' },
+    { id: '3', name: 'Social Media' },
+    { id: '4', name: 'Email Campaign' },
+    { id: '5', name: 'Cold Call' },
+    { id: '6', name: 'Walk-in' },
+    { id: '7', name: 'Other' },
+  ];
+
+  // Default lead statuses
+  const defaultStatuses: LeadStatus[] = [
+    { id: '1', name: 'New', color: '#3b82f6' },
+    { id: '2', name: 'In Progress', color: '#f59e0b' },
+    { id: '3', name: 'Hot', color: '#ef4444' },
+    { id: '4', name: 'Warm', color: '#f97316' },
+    { id: '5', name: 'Cold', color: '#64748b' },
+    { id: '6', name: 'Converted', color: '#10b981' },
+    { id: '7', name: 'Lost', color: '#6b7280' },
+  ];
+
+  // Default settings
+  const defaultSettings: SystemSettings = {
+    companyName: 'LeadsFlow CRM',
+    companyEmail: 'contact@company.com',
+    companyPhone: '+1 (555) 000-0000',
+    dateFormat: 'MM/DD/YYYY',
+    timeFormat: '12h',
+    timezone: 'UTC',
+  };
+
+  // Sample leads
+  const defaultLeads: Lead[] = [
+    {
+      id: '1',
+      name: 'Sarah Johnson',
+      phone: '+1 (555) 123-4567',
+      email: 'sarah.johnson@email.com',
+      source: 'Website',
+      status: 'New Lead',
+      assignedTo: '2',
+      assignedToName: 'John Sales',
+      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      id: '2',
+      name: 'Michael Chen',
+      phone: '+1 (555) 234-5678',
+      email: 'michael.chen@email.com',
+      source: 'Referral',
+      status: 'Contacted',
+      assignedTo: '2',
+      assignedToName: 'John Sales',
+      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      id: '3',
+      name: 'Emily Rodriguez',
+      phone: '+1 (555) 345-6789',
+      email: 'emily.r@email.com',
+      source: 'Social Media',
+      status: 'Qualified',
+      assignedTo: '2',
+      assignedToName: 'John Sales',
+      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      id: '4',
+      name: 'David Kim',
+      phone: '+1 (555) 456-7890',
+      email: 'david.kim@email.com',
+      source: 'Email Campaign',
+      status: 'New Lead',
+      assignedTo: '2',
+      assignedToName: 'John Sales',
+      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+  ];
+
+  // Sample follow-ups
+  const defaultFollowUps: FollowUp[] = [
+    {
+      id: '1',
+      leadId: '1',
+      leadName: 'Sarah Johnson',
+      userId: '2',
+      assignedTo: '2',
+      assignedToName: 'John Sales',
+      dueDate: new Date().toISOString().split('T')[0],
+      dueTime: '14:00',
+      notes: 'Follow up on initial inquiry',
+      isCompleted: false,
+      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      id: '2',
+      leadId: '3',
+      leadName: 'Emily Rodriguez',
+      userId: '2',
+      assignedTo: '2',
+      assignedToName: 'John Sales',
+      dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      dueTime: '10:00',
+      notes: 'Send proposal document',
+      isCompleted: false,
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+  ];
+
+  // Initialize localStorage if empty
+  if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(defaultUsers));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.LEADS)) {
+    localStorage.setItem(STORAGE_KEYS.LEADS, JSON.stringify(defaultLeads));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.PIPELINE_STAGES)) {
+    localStorage.setItem(STORAGE_KEYS.PIPELINE_STAGES, JSON.stringify(defaultStages));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.LEAD_SOURCES)) {
+    localStorage.setItem(STORAGE_KEYS.LEAD_SOURCES, JSON.stringify(defaultSources));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.LEAD_STATUSES)) {
+    localStorage.setItem(STORAGE_KEYS.LEAD_STATUSES, JSON.stringify(defaultStatuses));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(defaultSettings));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.NOTES)) {
+    localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify([]));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.ACTIVITIES)) {
+    localStorage.setItem(STORAGE_KEYS.ACTIVITIES, JSON.stringify([]));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.FOLLOW_UPS)) {
+    localStorage.setItem(STORAGE_KEYS.FOLLOW_UPS, JSON.stringify(defaultFollowUps));
+  }
+};
+
+// Generic storage helpers
+const getFromStorage = <T>(key: string): T[] => {
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : [];
+};
+
+const saveToStorage = <T>(key: string, data: T[]): void => {
+  localStorage.setItem(key, JSON.stringify(data));
+};
+
+// User management
+export const userService = {
+  getAll: (): User[] => getFromStorage<User>(STORAGE_KEYS.USERS),
+  
+  getById: (id: string): User | null => {
+    const users = getFromStorage<User>(STORAGE_KEYS.USERS);
+    return users.find(u => u.id === id) || null;
+  },
+  
+  create: (user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): User => {
+    const users = getFromStorage<User>(STORAGE_KEYS.USERS);
+    const now = new Date().toISOString();
+    const newUser: User = {
+      ...user,
+      id: Date.now().toString(),
+      createdAt: now,
+      updatedAt: now,
+    };
+    users.push(newUser);
+    saveToStorage(STORAGE_KEYS.USERS, users);
+    return newUser;
+  },
+
+  update: (id: string, updates: Partial<User>): User | null => {
+    const users = getFromStorage<User>(STORAGE_KEYS.USERS);
+    const index = users.findIndex(u => u.id === id);
+    if (index === -1) return null;
+    users[index] = {
+      ...users[index],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+    saveToStorage(STORAGE_KEYS.USERS, users);
+    return users[index];
+  },
+  
+  delete: (id: string): boolean => {
+    const users = getFromStorage<User>(STORAGE_KEYS.USERS);
+    const filtered = users.filter(u => u.id !== id);
+    if (filtered.length === users.length) return false;
+    saveToStorage(STORAGE_KEYS.USERS, filtered);
+    return true;
+  },
+};
+
+// Lead management
+export const leadService = {
+  getAll: (): Lead[] => getFromStorage<Lead>(STORAGE_KEYS.LEADS),
+  
+  getById: (id: string): Lead | null => {
+    const leads = getFromStorage<Lead>(STORAGE_KEYS.LEADS);
+    return leads.find(l => l.id === id) || null;
+  },
+  
+  create: (lead: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'>): Lead => {
+    const leads = getFromStorage<Lead>(STORAGE_KEYS.LEADS);
+    const newLead: Lead = {
+      ...lead,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    leads.push(newLead);
+    saveToStorage(STORAGE_KEYS.LEADS, leads);
+    
+    // Add activity
+    activityService.create({
+      leadId: newLead.id,
+      userId: '1',
+      userName: 'System',
+      action: 'created',
+      details: 'Lead created',
+    });
+    
+    return newLead;
+  },
+  
+  update: (id: string, updates: Partial<Lead>): Lead | null => {
+    const leads = getFromStorage<Lead>(STORAGE_KEYS.LEADS);
+    const index = leads.findIndex(l => l.id === id);
+    if (index === -1) return null;
+    leads[index] = { ...leads[index], ...updates, updatedAt: new Date().toISOString() };
+    saveToStorage(STORAGE_KEYS.LEADS, leads);
+    
+    // Add activity
+    activityService.create({
+      leadId: id,
+      userId: '1',
+      userName: 'System',
+      action: 'updated',
+      details: 'Lead information updated',
+    });
+    
+    return leads[index];
+  },
+  
+  delete: (id: string): boolean => {
+    const leads = getFromStorage<Lead>(STORAGE_KEYS.LEADS);
+    const filtered = leads.filter(l => l.id !== id);
+    if (filtered.length === leads.length) return false;
+    saveToStorage(STORAGE_KEYS.LEADS, filtered);
+    return true;
+  },
+  
+  bulkImport: (leads: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'>[]): Lead[] => {
+    const existingLeads = getFromStorage<Lead>(STORAGE_KEYS.LEADS);
+    const newLeads = leads.map(lead => ({
+      ...lead,
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }));
+    const allLeads = [...existingLeads, ...newLeads];
+    saveToStorage(STORAGE_KEYS.LEADS, allLeads);
+    return newLeads;
+  },
+};
+
+// Note management
+export const noteService = {
+  getByLeadId: (leadId: string): Note[] => {
+    const notes = getFromStorage<Note>(STORAGE_KEYS.NOTES);
+    return notes.filter(n => n.leadId === leadId).sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  },
+  
+  create: (note: Omit<Note, 'id' | 'createdAt'>): Note => {
+    const notes = getFromStorage<Note>(STORAGE_KEYS.NOTES);
+    const newNote: Note = {
+      ...note,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+    };
+    notes.push(newNote);
+    saveToStorage(STORAGE_KEYS.NOTES, notes);
+    return newNote;
+  },
+  
+  delete: (id: string): boolean => {
+    const notes = getFromStorage<Note>(STORAGE_KEYS.NOTES);
+    const filtered = notes.filter(n => n.id !== id);
+    if (filtered.length === notes.length) return false;
+    saveToStorage(STORAGE_KEYS.NOTES, filtered);
+    return true;
+  },
+};
+
+// Activity management
+export const activityService = {
+  getByLeadId: (leadId: string): Activity[] => {
+    const activities = getFromStorage<Activity>(STORAGE_KEYS.ACTIVITIES);
+    return activities.filter(a => a.leadId === leadId).sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  },
+  
+  create: (activity: Omit<Activity, 'id' | 'createdAt'>): Activity => {
+    const activities = getFromStorage<Activity>(STORAGE_KEYS.ACTIVITIES);
+    const newActivity: Activity = {
+      ...activity,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+    };
+    activities.push(newActivity);
+    saveToStorage(STORAGE_KEYS.ACTIVITIES, activities);
+    return newActivity;
+  },
+};
+
+// Follow-up management
+export const followUpService = {
+  getAll: (): FollowUp[] => getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS),
+  
+  getByLeadId: (leadId: string): FollowUp[] => {
+    const followUps = getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS);
+    return followUps.filter(f => f.leadId === leadId).sort((a, b) => 
+      new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+    );
+  },
+  
+  getTodayFollowUps: (): FollowUp[] => {
+    const followUps = getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS);
+    const today = new Date().toISOString().split('T')[0];
+    return followUps.filter(f =>
+      f.dueDate === today &&
+      f.status !== 'completed' &&
+      f.status !== 'cancelled'
+    );
+  },
+
+  getOverdueFollowUps: (): FollowUp[] => {
+    const followUps = getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS);
+    const today = new Date().toISOString().split('T')[0];
+    return followUps.filter(f =>
+      f.dueDate < today &&
+      f.status !== 'completed' &&
+      f.status !== 'cancelled'
+    );
+  },
+
+  getByStatus: (status: string): FollowUp[] => {
+    const followUps = getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS);
+    return followUps.filter(f => f.status === status);
+  },
+
+  getByAssignedUser: (userId: string): FollowUp[] => {
+    const followUps = getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS);
+    return followUps.filter(f => f.assignedTo === userId);
+  },
+  
+  create: (followUp: Omit<FollowUp, 'id' | 'createdAt' | 'completedDate'>): FollowUp => {
+    const followUps = getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS);
+    const newFollowUp: FollowUp = {
+      ...followUp,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      // Ensure status is set (default to 'scheduled' if not provided)
+      status: followUp.status || 'scheduled',
+    };
+    followUps.push(newFollowUp);
+    saveToStorage(STORAGE_KEYS.FOLLOW_UPS, followUps);
+    return newFollowUp;
+  },
+
+  update: (id: string, updates: Partial<FollowUp>): FollowUp | null => {
+    const followUps = getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS);
+    const index = followUps.findIndex(f => f.id === id);
+    if (index === -1) return null;
+
+    // Auto-populate completedDate when status changes to 'completed'
+    const updatedFollowUp = { ...followUps[index], ...updates };
+    if (updates.status === 'completed' && !updatedFollowUp.completedDate) {
+      updatedFollowUp.completedDate = new Date().toISOString();
+    }
+
+    // Clear completedDate if status changes from 'completed' to something else
+    if (updates.status && updates.status !== 'completed' && followUps[index].status === 'completed') {
+      updatedFollowUp.completedDate = undefined;
+    }
+
+    followUps[index] = updatedFollowUp;
+    saveToStorage(STORAGE_KEYS.FOLLOW_UPS, followUps);
+    return followUps[index];
+  },
+
+  markAsCompleted: (id: string): FollowUp | null => {
+    return followUpService.update(id, {
+      status: 'completed',
+      completedDate: new Date().toISOString()
+    });
+  },
+
+  markAsMissed: (id: string): FollowUp | null => {
+    return followUpService.update(id, { status: 'missed' });
+  },
+
+  markAsInProgress: (id: string): FollowUp | null => {
+    return followUpService.update(id, { status: 'in-progress' });
+  },
+  
+  delete: (id: string): boolean => {
+    const followUps = getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS);
+    const filtered = followUps.filter(f => f.id !== id);
+    if (filtered.length === followUps.length) return false;
+    saveToStorage(STORAGE_KEYS.FOLLOW_UPS, filtered);
+    return true;
+  },
+};
+
+// Pipeline stages
+export const pipelineService = {
+  getAll: (): PipelineStage[] => {
+    const stages = getFromStorage<PipelineStage>(STORAGE_KEYS.PIPELINE_STAGES);
+    return stages.sort((a, b) => a.order - b.order);
+  },
+  
+  create: (stage: Omit<PipelineStage, 'id'>): PipelineStage => {
+    const stages = getFromStorage<PipelineStage>(STORAGE_KEYS.PIPELINE_STAGES);
+    const newStage: PipelineStage = {
+      ...stage,
+      id: Date.now().toString(),
+    };
+    stages.push(newStage);
+    saveToStorage(STORAGE_KEYS.PIPELINE_STAGES, stages);
+    return newStage;
+  },
+  
+  update: (id: string, updates: Partial<PipelineStage>): PipelineStage | null => {
+    const stages = getFromStorage<PipelineStage>(STORAGE_KEYS.PIPELINE_STAGES);
+    const index = stages.findIndex(s => s.id === id);
+    if (index === -1) return null;
+    stages[index] = { ...stages[index], ...updates };
+    saveToStorage(STORAGE_KEYS.PIPELINE_STAGES, stages);
+    return stages[index];
+  },
+  
+  delete: (id: string): boolean => {
+    const stages = getFromStorage<PipelineStage>(STORAGE_KEYS.PIPELINE_STAGES);
+    const filtered = stages.filter(s => s.id !== id);
+    if (filtered.length === stages.length) return false;
+    saveToStorage(STORAGE_KEYS.PIPELINE_STAGES, filtered);
+    return true;
+  },
+};
+
+// Lead sources
+export const sourceService = {
+  getAll: (): LeadSource[] => getFromStorage<LeadSource>(STORAGE_KEYS.LEAD_SOURCES),
+  
+  create: (source: Omit<LeadSource, 'id'>): LeadSource => {
+    const sources = getFromStorage<LeadSource>(STORAGE_KEYS.LEAD_SOURCES);
+    const newSource: LeadSource = {
+      ...source,
+      id: Date.now().toString(),
+    };
+    sources.push(newSource);
+    saveToStorage(STORAGE_KEYS.LEAD_SOURCES, sources);
+    return newSource;
+  },
+  
+  update: (id: string, updates: Partial<LeadSource>): LeadSource | null => {
+    const sources = getFromStorage<LeadSource>(STORAGE_KEYS.LEAD_SOURCES);
+    const index = sources.findIndex(s => s.id === id);
+    if (index === -1) return null;
+    sources[index] = { ...sources[index], ...updates };
+    saveToStorage(STORAGE_KEYS.LEAD_SOURCES, sources);
+    return sources[index];
+  },
+  
+  delete: (id: string): boolean => {
+    const sources = getFromStorage<LeadSource>(STORAGE_KEYS.LEAD_SOURCES);
+    const filtered = sources.filter(s => s.id !== id);
+    if (filtered.length === sources.length) return false;
+    saveToStorage(STORAGE_KEYS.LEAD_SOURCES, filtered);
+    return true;
+  },
+};
+
+// Lead statuses
+export const statusService = {
+  getAll: (): LeadStatus[] => getFromStorage<LeadStatus>(STORAGE_KEYS.LEAD_STATUSES),
+  
+  create: (status: Omit<LeadStatus, 'id'>): LeadStatus => {
+    const statuses = getFromStorage<LeadStatus>(STORAGE_KEYS.LEAD_STATUSES);
+    const newStatus: LeadStatus = {
+      ...status,
+      id: Date.now().toString(),
+    };
+    statuses.push(newStatus);
+    saveToStorage(STORAGE_KEYS.LEAD_STATUSES, statuses);
+    return newStatus;
+  },
+  
+  update: (id: string, updates: Partial<LeadStatus>): LeadStatus | null => {
+    const statuses = getFromStorage<LeadStatus>(STORAGE_KEYS.LEAD_STATUSES);
+    const index = statuses.findIndex(s => s.id === id);
+    if (index === -1) return null;
+    statuses[index] = { ...statuses[index], ...updates };
+    saveToStorage(STORAGE_KEYS.LEAD_STATUSES, statuses);
+    return statuses[index];
+  },
+  
+  delete: (id: string): boolean => {
+    const statuses = getFromStorage<LeadStatus>(STORAGE_KEYS.LEAD_STATUSES);
+    const filtered = statuses.filter(s => s.id !== id);
+    if (filtered.length === statuses.length) return false;
+    saveToStorage(STORAGE_KEYS.LEAD_STATUSES, filtered);
+    return true;
+  },
+};
+
+// Settings
+export const settingsService = {
+  get: (): SystemSettings => {
+    const settings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+    return settings ? JSON.parse(settings) : {
+      companyName: 'LeadsFlow CRM',
+      companyEmail: '',
+      companyPhone: '',
+      dateFormat: 'MM/DD/YYYY',
+      timeFormat: '12h',
+      timezone: 'UTC',
+    };
+  },
+  
+  update: (settings: SystemSettings): void => {
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+  },
+};
+
+// Authentication
+export const authService = {
+  login: (email: string, password: string): User | null => {
+    const users = getFromStorage<User>(STORAGE_KEYS.USERS);
+    const user = users.find(u => u.email === email && u.isActive);
+    if (user) {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+      return user;
+    }
+    return null;
+  },
+  
+  logout: (): void => {
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+  },
+  
+  getCurrentUser: (): User | null => {
+    const userData = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+    return userData ? JSON.parse(userData) : null;
+  },
+};
+
+// Dashboard statistics
+export const dashboardService = {
+  getStats: (): DashboardStats => {
+    const leads = getFromStorage<Lead>(STORAGE_KEYS.LEADS);
+    const followUps = getFromStorage<FollowUp>(STORAGE_KEYS.FOLLOW_UPS);
+    const today = new Date().toISOString().split('T')[0];
+    
+    const leadsByStatus: Record<string, number> = {};
+    const leadsBySource: Record<string, number> = {};
+    const leadsByUser: Record<string, number> = {};
+    
+    leads.forEach(lead => {
+      leadsByStatus[lead.status] = (leadsByStatus[lead.status] || 0) + 1;
+      leadsBySource[lead.source] = (leadsBySource[lead.source] || 0) + 1;
+      leadsByUser[lead.assignedToName || 'Unassigned'] = (leadsByUser[lead.assignedToName || 'Unassigned'] || 0) + 1;
+    });
+    
+    const todayFollowUps = followUps.filter(f => f.dueDate === today && !f.isCompleted).length;
+    const overdueFollowUps = followUps.filter(f => f.dueDate < today && !f.isCompleted).length;
+    
+    return {
+      totalLeads: leads.length,
+      activeLeads: leads.filter(l => l.status !== 'Closed Won' && l.status !== 'Closed Lost').length,
+      convertedLeads: leads.filter(l => l.status === 'Closed Won').length,
+      todayFollowUps,
+      overdueFollowUps,
+      leadsByStatus,
+      leadsBySource,
+      leadsByUser,
+    };
+  },
+};
+
+// Initialize data on module load
+initDefaultData();

@@ -1,0 +1,90 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional Stylelint cache
+.stylelintcache
+
+# Next.js build output
+.next/
+out/
+
+# Nuxt.js build output
+.nuxt/
+dist/
+
+# Vite build output
+dist/
+dist-ssr/
+*.local
+
+# Server build output
+server/dist/
+server/logs/
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+*.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment variables
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+server/.env
+server/.env.local
+
+# Documentation and temporary files
+*.tmp
+*.temp
+MONGODB_COMPASS_CONNECTION.txt
+QUICK_FIX_COMPASS.txt
+QUICK_FIX_SUMMARY.txt
+
+# Docker
+.dockerignore
+# Docker compose data (if any was locally mapped)
+# data/
+
+# Optional: Ignore backup files
+*~
+*.bak
+*.swp
+*.swo
