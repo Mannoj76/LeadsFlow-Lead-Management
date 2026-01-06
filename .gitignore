@@ -6,6 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+coverage/
 
 # Dependency directories
 node_modules/
@@ -34,6 +35,7 @@ dist/
 # Vite build output
 dist/
 dist-ssr/
+build/
 *.local
 
 # Server build output
